@@ -87,10 +87,10 @@ exports.createTask = (task) => {
 };
 
 // PUT to update an existing task
-exports.updateTask = (task, id) => {
+exports.updateTask = (task) => {
     return new Promise((resolve, reject) => {
         const sql = `UPDATE tasks SET description=?, important=?, private=?, deadline=STRFTIME('%Y-%m-%d %H:%M', ?), completed=? WHERE id = ?`;
-        db.run(sql, [task.description, task.important, task.private, task.deadline, task.completed, id], function (err) {
+        db.run(sql, [task.description, task.important, task.private, task.deadline, task.completed, task.id], function (err) {
             if (err) {
                 reject(err);
                 return;
