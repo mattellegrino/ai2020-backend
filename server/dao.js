@@ -16,7 +16,7 @@ exports.listTasks = () => {
                 return;
             }
             const tasks = rows.map((t) =>
-                ({ id: t.id, description: t.description, important: t.important, private: t.private, deadline: t.deadline, completed: t.completed, user: t.user }));
+                ({ id: t.id, description: t.description, urgent: t.important, private: t.private, deadline: t.deadline, completed: t.completed, user: t.user }));
             resolve(tasks);
         })
     })
@@ -71,8 +71,9 @@ exports.getTask = (id) => {
 // POST to create a new task in the db
 exports.createTask = (task) => {
     // create default time
-    if(task.deadline.search(":") === -1){
-        task.deadline = task.deadline.concat(" 00:00");
+    if(task.deadline!==undefined){
+        if(task.deadline.search(":") === -1)
+            task.deadline = task.deadline.concat(" 23:59");
     }
     return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO tasks(description, important, private, deadline, completed, user) VALUES(?, ?, ?, STRFTIME(?), 0, 1)';

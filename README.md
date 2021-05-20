@@ -208,8 +208,7 @@ Method: DELETE
 
 Request body: _None_
 
-Response: `200 OK` (success), `503 Service Unavailable` (generic error), or `404 Not Found` if trying 
-          to delete a non-existing task.
+Response: `204 No Content` (success), `503 Service Unavailable` (generic error).
 
 Response body: _None_ 
 

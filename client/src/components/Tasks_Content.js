@@ -20,13 +20,13 @@ function TasksContent(props) {
                         if (props.filter === 'All')
                             return true;
                         else if (props.filter === 'Important')
-                            return task.urgent === true;
+                            return task.urgent == true;
                         else if (props.filter === 'Today')
                             return task.deadline ? task.deadline.isToday() === true : false;
                         else if (props.filter === 'Next 7 Days')
                             return task.deadline ? task.deadline.isBetween(dayjs(), dayjs().add(7, 'day')) === true : false;
                         else if (props.filter === 'Private')
-                            return task.private === true;
+                            return task.private == true;
                         return false;
                     })
                         .map((t) => <TaskRow key={t.id}

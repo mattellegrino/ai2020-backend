@@ -2,23 +2,33 @@ import { Container, Row } from 'react-bootstrap'
 import SidebarTasks from './Sidebar_Comp'
 import { TasksContent } from './Tasks_Content'
 import AddTask from './AddButton'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Route, Switch, useLocation } from 'react-router'
+import API from '../API'
 
-
-function PageContent(props) {
+function PageContent() {
     const location = useLocation();
-
-    const [tasks, setTasks] = useState([...props.tasks]);
     const [filter, setFilter] = useState(location.state ? location.state.filter : 'All');
+    const [tasks, setTasks] = useState([]);
+
+    useEffect(() => {
+        const getTasks = async () =>{
+          const list = await API.RetrieveTaskList();
+          setTasks(list);
+        }
+        getTasks(); 
+      }, [tasks.length]);
 
     const handleFilter = (new_f) => {
         setFilter(new_f);
     }
-
+    
+    /* DB-SAVING TASKS*/ 
     const TaskAdder = (task) => {
         setTasks(tasks => [...tasks, task]);
+        API.addTaskDB(task);
     }
+
     const deleteTask = (id) => {
         setTasks((tasks) => tasks.filter(t => t.id !== id))
     }
