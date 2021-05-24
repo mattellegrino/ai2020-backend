@@ -73,5 +73,5 @@ return new Promise((resolve, reject) => {
 }
 
 
-const API = {RetrieveTaskList, addTaskDB, updateTask};
+const API = {RetrieveTaskList, addTaskDB, updateTask, deleteTask};
 export default API;
