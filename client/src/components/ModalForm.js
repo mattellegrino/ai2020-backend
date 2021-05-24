@@ -71,6 +71,7 @@ function ModalForm(props) {
                 <Form.Group>
                     <Form.Switch custom id="urgent-switch" label="Urgent" className="ml-5 mb-2" defaultChecked={form.urgent} onChange={event => setField('urgent', event.target.checked)} />
                     <Form.Switch custom id="private-switch" label="Private" className="ml-5 mb-2" defaultChecked={form.private} onChange={event => setField('private', event.target.checked)} />
+                   
                 </Form.Group>
                 <Form.Group className="ml-3 mr-3" controlId="data">
                     <Form.Label className="ml-2">Task Deadline</Form.Label>

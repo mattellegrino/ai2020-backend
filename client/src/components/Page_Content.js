@@ -61,6 +61,7 @@ function PageContent() {
         }).catch( err => handleErrors(err) );
     }
     const updateTask = (task) => {
+
         setTasks(tasks => {
             return tasks.map(t => {
                 if (t.id === task.id)
@@ -69,6 +70,8 @@ function PageContent() {
                     return t;
             });
         });
+
+        API.updateTask(task);
     };
 
     
