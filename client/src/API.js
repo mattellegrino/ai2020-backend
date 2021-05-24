@@ -28,5 +28,32 @@ function addTaskDB(task){
     })
 }
 
-const API = {RetrieveTaskList, addTaskDB};
+
+function updateTask(task) {
+// call PUT /api/tasks/:id
+return new Promise((resolve, reject) => {
+
+ fetch(`api/tasks/${task.id}`, {
+     method: 'PUT',
+     headers: {'Content-Type': 'application/json'},
+     body: JSON.stringify({id: task.id, description: task.description, important: task.urgent, completed: task.completed, private: task.private, deadline: task.deadline})
+ }).then((response)=> {
+     if(response.ok) {
+         resolve(null);
+     }
+
+     else {
+         //analyze and return the error
+         
+         response.json().then((obj)=> {reject(obj);})
+     }
+ }).catch(err => {reject({'error': 'Cannot communicate with the server'})});
+
+ })
+
+
+}
+
+
+const API = {RetrieveTaskList, addTaskDB, updateTask};
 export default API;

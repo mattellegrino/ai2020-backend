@@ -33,6 +33,7 @@ function PageContent() {
         setTasks((tasks) => tasks.filter(t => t.id !== id))
     }
     const updateTask = (task) => {
+
         setTasks(tasks => {
             return tasks.map(t => {
                 if (t.id === task.id)
@@ -41,6 +42,8 @@ function PageContent() {
                     return t;
             });
         });
+
+        API.updateTask(task);
     };
     return (
         <Container fluid>

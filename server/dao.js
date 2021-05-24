@@ -93,9 +93,11 @@ exports.updateTask = (task) => {
         const sql = `UPDATE tasks SET description=?, important=?, private=?, deadline=STRFTIME('%Y-%m-%d %H:%M', ?), completed=? WHERE id = ?`;
         db.run(sql, [task.description, task.important, task.private, task.deadline, task.completed, task.id], function (err) {
             if (err) {
+                
                 reject(err);
                 return;
             }
+            
             resolve(this.lastID);
         });
     });
