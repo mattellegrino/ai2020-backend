@@ -42,8 +42,22 @@ function TasksContent(props) {
 }
 
 function TaskRow(props) {
+    let statusClass = null;
+    switch (props.task.status) {
+        case 'added':
+            statusClass = 'bg-success';
+            break;
+        case 'updated':
+            statusClass = 'bg-warning';
+            break;
+        case 'deleted':
+            statusClass = 'bg-danger';
+            break;
+        default:
+            break;
+    }
     return (<>
-        <ListGroupItem>
+        <ListGroupItem className={statusClass}>
             <Container className="d-flex justify-content-between">
                 <TaskRowData task={props.task} />
                 <ButtonGroup>
@@ -58,7 +72,7 @@ function TaskRow(props) {
 function TaskRowData(props) {
     return (<>
         <Form.Check>
-            <Form.Check.Input type="checkbox" value="" id={props.task.id} />
+            <Form.Check.Input type="checkbox" value='' id={props.task.id} />
             {
                 props.task.urgent ? <Form.Check.Label htmlFor={props.task.id} className="colore">{props.task.description}</Form.Check.Label> :
                     <Form.Check.Label htmlFor={props.task.id} >{props.task.description}</Form.Check.Label>
@@ -72,7 +86,7 @@ function TaskRowData(props) {
         }
 
     </>
-  );
+    );
 }
 
 export { TasksContent };

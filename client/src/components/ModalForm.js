@@ -17,7 +17,8 @@ function ModalForm(props) {
         const newErrors = {};
 
         if (!desc || desc === '') newErrors.desc = 'cannot be blank!';
-        else if (!props.edit && props.tasks.filter(t => t.description === desc).length > 0) newErrors.desc = 'Task already in th list!';
+        else if (!props.edit && props.tasks.filter(t => t.description === desc).length > 0) newErrors.desc = 'Task already in the list!';
+        else if(props.edit && props.tasks.find(t => t.description === desc) !== undefined) newErrors.desc = 'Task already in the list!';
 
         if (dayjs(date) < dayjs().subtract(1, 'day')) newErrors.date = 'Invalid date!';
         return newErrors;

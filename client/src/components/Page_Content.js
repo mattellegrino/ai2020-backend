@@ -16,11 +16,11 @@ function PageContent() {
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
-        const getTasks = async () =>{
-          const list = await API.RetrieveTaskList();
-          setTasks(list);
+        const getTasks = async () => {
+            const list = await API.RetrieveTaskList();
+            setTasks(list);
         }
-        if(dirty){
+        if (dirty) {
             getTasks().then(() => {
                 setLoading(false);
                 setDirty(false);
@@ -28,53 +28,68 @@ function PageContent() {
                 setErrorMsg("Impossible to load the list of tasks! Please, try again later...");
                 console.error(err);
             });;
-        } 
-      }, [tasks.length, dirty]);
+        }
+    }, [tasks.length, dirty]);
 
     const handleFilter = (new_f) => {
         setFilter(new_f);
+
+        API.RetrieveTaskListFiltered(new_f)
+        .then(() => {
+            setDirty(true);
+        }).catch(err => handleErrors(err));
     }
 
     const handleErrors = (err) => {
-        if(err.errors)
+        if (err.errors)
             setErrorMsg(err.errors[0].msg + ': ' + err.errorrs[0].param);
         else
             setErrorMsg(err.error);
         setDirty(true);
     }
-    /* DB-SAVING TASKS*/ 
+    /* DB-SAVING TASKS*/
     const TaskAdder = (task) => {
+        task.status = 'added';
         setTasks(tasks => [...tasks, task]);
-        
+
         API.addTaskDB(task)
-        .then(() => {
-            setDirty(true);
-        }).catch( err => handleErrors(err) );
+            .then(() => {
+                setDirty(true);
+            }).catch(err => handleErrors(err));
     }
 
     const deleteTask = (id) => {
-        setTasks((tasks) => tasks.filter(t => t.id !== id));
+        // set temporary deleted task
+        setTasks(oldTasks => {
+            return oldTasks.map( t => {
+                if(t.id === id)
+                    return {...t, status: 'deleted'};
+                else return t;
+            });
+        });
 
         API.deleteTask(id)
-        .then(() => {
-            setDirty(true);
-        }).catch( err => handleErrors(err) );
+            .then(() => {
+                setDirty(true);
+            }).catch(err => handleErrors(err));
     }
     const updateTask = (task) => {
-
+        // set temporary updated task
         setTasks(tasks => {
             return tasks.map(t => {
                 if (t.id === task.id)
-                    return { id: task.id, description: task.description, urgent: task.urgent, private: task.private, deadline: task.deadline };
+                    return { id: task.id, description: task.description, urgent: task.urgent, private: task.private, deadline: task.deadline, status: 'updated' };
                 else
                     return t;
             });
         });
-
-        API.updateTask(task);
+        API.updateTask(task)
+            .then(() => {
+                setDirty(true);
+            }).catch(err => handleErrors(err));
     };
 
-    
+
     return (
         <Container fluid>
             <Row className="vheight-100">

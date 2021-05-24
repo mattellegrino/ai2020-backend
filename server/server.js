@@ -16,7 +16,7 @@ app.get('/api/tasks', async (req, res) => {
         setTimeout(async ()=>{
             const tasks = await dao.listTasks();
             res.json(tasks);
-        }, 1500);
+        }, 1000);
     }
     catch (err) {
         res.status(500).end();

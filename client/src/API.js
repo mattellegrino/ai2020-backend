@@ -10,6 +10,23 @@ async function RetrieveTaskList() {
     else throw list;
 }
 
+async function RetrieveTaskListFiltered(filter) {
+    // call GET /api/tasks/filter/:filter
+    const response = await fetch("/api/tasks/filter/" + filter);
+    const list = await response.json();
+    if (response.ok)
+      return list.map((t) => ({
+        id: t.id,
+        description: t.description,
+        urgent: t.urgent,
+        private: t.private,
+        deadline: t.deadline ? dayjs(t.deadline) : undefined,
+        completed: t.completed,
+        user: t.user,
+      }));
+    else throw list;
+  }
+
 function addTaskDB(task) {
     // call POST /api/tasks
     return new Promise((resolve, reject) => {
@@ -53,7 +70,7 @@ function updateTask(task) {
         fetch(`api/tasks/${task.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: task.id, description: task.description, important: task.urgent, completed: task.completed, private: task.private, deadline: task.deadline })
+            body: JSON.stringify({ id: task.id, description: task.description, important: task.urgent, completed: task.completed, private: task.private, deadline: task.deadline ? task.deadline.format('YYYY-MM-DD') : undefined })
         }).then((response) => {
             if (response.ok) {
                 resolve(null);
@@ -69,5 +86,5 @@ function updateTask(task) {
 }
 
 
-const API = { RetrieveTaskList, addTaskDB, updateTask, deleteTask };
+const API = { RetrieveTaskList, addTaskDB, updateTask, deleteTask, RetrieveTaskListFiltered };
 export default API;
