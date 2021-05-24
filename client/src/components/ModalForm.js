@@ -32,8 +32,13 @@ function ModalForm(props) {
         }
         else {
             let new_Task = {};
-            if (props.edit)
-                new_Task = { id: props.task.id, description: form.desc, urgent: form.urgent, private: form.private, deadline: form.date };
+            if (props.edit){
+                if(form.date.isValid())
+                    new_Task = { id: props.task.id, description: form.desc, urgent: form.urgent, private: form.private, deadline: form.date };
+                else
+                    new_Task = { id: props.task.id, description: form.desc, urgent: form.urgent, private: form.private, deadline: undefined };
+            }
+                
             else {
                 new_Task = { id: props.tasks.length + 1, description: form.desc, urgent: form.urgent, private: form.private, deadline: form.date };
                 setForm({});
@@ -44,7 +49,7 @@ function ModalForm(props) {
     }
 
     const handleDate = (date) => {
-        if (date !== undefined) return date.format('YYYY-MM-DD');
+        if (date!==undefined) return date.format('YYYY-MM-DD');
         else return date;
     }
     return (<>

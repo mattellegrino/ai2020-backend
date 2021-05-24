@@ -13,8 +13,10 @@ app.use(express.json());
 // Get the list of all tasks
 app.get('/api/tasks', async (req, res) => {
     try {
-        const tasks = await dao.listTasks();
-        res.json(tasks);
+        setTimeout(async ()=>{
+            const tasks = await dao.listTasks();
+            res.json(tasks);
+        }, 1500);
     }
     catch (err) {
         res.status(500).end();
@@ -55,7 +57,7 @@ app.post('/api/tasks',
         check("description").isLength({ max: 40 }),
         check("urgent").isBoolean(),
         check("private").isBoolean(),
-        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }),
+        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }).optional(),
     ],
     async (req, res) => {
         const newtask = {
@@ -76,16 +78,15 @@ app.post('/api/tasks',
 // Update task
 app.put('/api/tasks/:id',
     [
-        check("id").isInt({ min: 1, max: 99 }),
+        check("id").isInt(),
         check("description").isLength({ max: 40 }),
         check("important").isBoolean(),
         check("completed").isInt({ min: 0, max: 1 }),
         check("private").isBoolean(),
-        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }),
+        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }).optional(),
     ],
     async (req, res) => {
         const task = req.body;
-
         try {
             await dao.updateTask(task);
             res.status(200).end();
@@ -98,12 +99,12 @@ app.put('/api/tasks/:id',
 // Mark task as completed/uncompleted
 app.put('/api/tasks/:id/:mark',
     [
-        check("id").isInt({ min: 1, max: 99 }),
+        check("id").isInt(),
         check("description").isLength({ max: 40 }),
         check("important").isBoolean(),
         check("completed").isInt({ min: 0, max: 1 }),
         check("private").isBoolean(),
-        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }),
+        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }).optional(),
     ], 
     async (req, res) => {
         const task = await dao.getTask(req.params.id);

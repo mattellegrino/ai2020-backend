@@ -28,6 +28,24 @@ function addTaskDB(task){
     })
 }
 
+function deleteTask(id){
+    // call DELETE /api/tasks/:id
+    return new Promise((resolve, reject) => {
+        fetch('/api/tasks/' + id, {
+            method: 'DELETE',
+        }).then((response) => {
+            if(response.ok){
+                resolve(null);
+            }else{
+                // analyze the source of the error
+                response.json()
+                .then((message) => { reject(message); }) // error message in response body
+                .catch(() => { reject({error: "Cannot parse response from server. "}) });
+            }
+        }).catch(() => { reject({ error: "Cannot communicate with the server. "}) }); // connection errors 
+    })
+}
+
 
 function updateTask(task) {
 // call PUT /api/tasks/:id

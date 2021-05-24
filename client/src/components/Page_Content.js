@@ -1,36 +1,64 @@
-import { Container, Row } from 'react-bootstrap'
+import { Container, Row, Alert } from 'react-bootstrap'
 import SidebarTasks from './Sidebar_Comp'
 import { TasksContent } from './Tasks_Content'
 import AddTask from './AddButton'
 import { useState, useEffect } from 'react'
 import { Route, Switch, useLocation } from 'react-router'
+import { Clock } from 'react-bootstrap-icons'
 import API from '../API'
 
 function PageContent() {
     const location = useLocation();
     const [filter, setFilter] = useState(location.state ? location.state.filter : 'All');
     const [tasks, setTasks] = useState([]);
+    const [dirty, setDirty] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
         const getTasks = async () =>{
           const list = await API.RetrieveTaskList();
           setTasks(list);
         }
-        getTasks(); 
-      }, [tasks.length]);
+        if(dirty){
+            getTasks().then(() => {
+                setLoading(false);
+                setDirty(false);
+            }).catch(err => {
+                setErrorMsg("Impossible to load the list of tasks! Please, try again later...");
+                console.error(err);
+            });;
+        } 
+      }, [tasks.length, dirty]);
 
     const handleFilter = (new_f) => {
         setFilter(new_f);
     }
-    
+
+    const handleErrors = (err) => {
+        if(err.errors)
+            setErrorMsg(err.errors[0].msg + ': ' + err.errorrs[0].param);
+        else
+            setErrorMsg(err.error);
+        setDirty(true);
+    }
     /* DB-SAVING TASKS*/ 
     const TaskAdder = (task) => {
         setTasks(tasks => [...tasks, task]);
-        API.addTaskDB(task);
+        
+        API.addTaskDB(task)
+        .then(() => {
+            setDirty(true);
+        }).catch( err => handleErrors(err) );
     }
 
     const deleteTask = (id) => {
-        setTasks((tasks) => tasks.filter(t => t.id !== id))
+        setTasks((tasks) => tasks.filter(t => t.id !== id));
+
+        API.deleteTask(id)
+        .then(() => {
+            setDirty(true);
+        }).catch( err => handleErrors(err) );
     }
     const updateTask = (task) => {
 
@@ -45,16 +73,24 @@ function PageContent() {
 
         API.updateTask(task);
     };
+
+    
     return (
         <Container fluid>
             <Row className="vheight-100">
                 <SidebarTasks tasks={tasks} handleFilter={handleFilter} filter={filter} />
                 <Switch>
-                    <Route exact path="/">
-                        <TasksContent tasks={tasks} filter={filter} deleteTask={deleteTask} TaskAdder={updateTask} />
+                    <Route path="/">
+                        <Row className="below-nav">{errorMsg && <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible> {errorMsg} </Alert>}</Row>
+                        {loading ? <span className="col-sm-8 col-12 below-nav" > <h1><Clock /> Please wait, loading the list of tasks...</h1> </span>
+                            : <TasksContent tasks={tasks} filter={filter} deleteTask={deleteTask} TaskAdder={updateTask} />
+                        }
                     </Route>
                     <Route exact path="/All">
-                        <TasksContent tasks={tasks} filter={filter} deleteTask={deleteTask} TaskAdder={updateTask} />
+                        <Row>{errorMsg && <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible> {errorMsg} </Alert>}</Row>
+                        {loading ? <span className="col-sm-8 col-12 below-nav" > <h1><Clock /> Please wait, loading the list of tasks...</h1> </span>
+                            : <TasksContent tasks={tasks} filter={filter} deleteTask={deleteTask} TaskAdder={updateTask} />
+                        }
                     </Route>
                     <Route exact path="/Important">
                         <TasksContent tasks={tasks} filter={filter} deleteTask={deleteTask} TaskAdder={updateTask} />

@@ -8,8 +8,8 @@ function TasksContent(props) {
     var isToday = require('dayjs/plugin/isToday')
     dayjs.extend(isToday)
 
-  var isBetween = require("dayjs/plugin/isBetween");
-  dayjs.extend(isBetween);
+    var isBetween = require("dayjs/plugin/isBetween");
+    dayjs.extend(isBetween);
 
     return (
         <Container className="col-sm-8 col-12 below-nav">
