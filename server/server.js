@@ -57,7 +57,7 @@ app.post('/api/tasks',
         check("description").isLength({ max: 40 }),
         check("urgent").isBoolean(),
         check("private").isBoolean(),
-        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }).optional(),
+        check("deadline").isDate({ format: "YYYY-MM-DD HH:mm", strictMode: true }).optional(),
     ],
     async (req, res) => {
         const newtask = {
@@ -83,7 +83,7 @@ app.put('/api/tasks/:id',
         check("important").isBoolean(),
         check("completed").isInt({ min: 0, max: 1 }),
         check("private").isBoolean(),
-        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }).optional(),
+        check("deadline").isDate({ format: "YYYY-MM-DD HH:mm", strictMode: true }).optional(),
     ],
     async (req, res) => {
         const task = req.body;
@@ -104,7 +104,7 @@ app.put('/api/tasks/:id/:mark',
         check("important").isBoolean(),
         check("completed").isInt({ min: 0, max: 1 }),
         check("private").isBoolean(),
-        check("deadline").isDate({ format: "YYYY-MM-DD", strictMode: true }).optional(),
+        check("deadline").isDate({ format: "YYYY-MM-DD HH:mm", strictMode: true }).optional(),
     ], 
     async (req, res) => {
         const task = await dao.getTask(req.params.id);

@@ -2,6 +2,8 @@ import { ListGroup, ListGroupItem, Container, Button, Form, ButtonGroup } from '
 import { PersonSquare, Trash } from 'react-bootstrap-icons'
 import dayjs from 'dayjs'
 import AddTask from './AddButton';
+import API from '../API'
+import { Alert } from 'react-bootstrap';
 
 function TasksContent(props) {
 
@@ -10,10 +12,11 @@ function TasksContent(props) {
 
     var isBetween = require("dayjs/plugin/isBetween");
     dayjs.extend(isBetween);
-
+    
     return (
         <Container className="col-sm-8 col-12 below-nav">
             <h1><strong>Filter Selected: </strong><i>{props.filter}</i></h1>
+            <Alert variant="warning" >Note: Use the checkbox provided for each task to mark/unmark the task as completed/uncompleted</Alert>
             <ListGroup variant="flush">
                 {
                     props.tasks.filter(task => {
@@ -23,7 +26,7 @@ function TasksContent(props) {
                             return task.urgent == true;
                         else if (props.filter === 'Today')
                             return task.deadline ? task.deadline.isToday() === true : false;
-                        else if (props.filter === 'Next 7 Days')
+                        else if (props.filter === 'Next7Days')
                             return task.deadline ? task.deadline.isBetween(dayjs(), dayjs().add(7, 'day')) === true : false;
                         else if (props.filter === 'Private')
                             return task.private == true;
@@ -70,9 +73,19 @@ function TaskRow(props) {
 }
 
 function TaskRowData(props) {
+
+    const handleCheckbox = async (ev) => {
+        if(ev===true){
+            props.task.completed = 1;
+        }
+        else props.task.completed = 0;
+        API.markTask(props.task);
+        return props.task.completed;
+    }
+
     return (<>
         <Form.Check>
-            <Form.Check.Input type="checkbox" value='' id={props.task.id} />
+            <Form.Check.Input type="checkbox" defaultChecked={!!props.task.completed} id={props.task.id} onChange={event => handleCheckbox(event.target.checked)}/>
             {
                 props.task.urgent ? <Form.Check.Label htmlFor={props.task.id} className="colore">{props.task.description}</Form.Check.Label> :
                     <Form.Check.Label htmlFor={props.task.id} >{props.task.description}</Form.Check.Label>
@@ -82,7 +95,7 @@ function TaskRowData(props) {
             props.task.private ? '' : <PersonSquare size={25} />
         }
         {
-            props.task.deadline ? <div>{props.task.deadline.format('DD/MM/YYYY')}</div> : <small> </small>
+            props.task.deadline ? <div>{props.task.deadline.format('DD/MM/YYYY HH:mm')}</div> : <small> </small>
         }
 
     </>

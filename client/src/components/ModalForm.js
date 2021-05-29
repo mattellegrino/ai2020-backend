@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap'
 
 function ModalForm(props) {
-    const [form, setForm] = useState(props.edit ? { desc: props.task.description, urgent: props.task.urgent, private: props.task.private, date: props.task.deadline } : {});
+    const [form, setForm] = useState(props.edit ? { id: props.task.id, desc: props.task.description, urgent: props.task.urgent, private: props.task.private, date: props.task.deadline } : {});
     const [errors, setErrors] = useState({});
 
     const setField = (field, value) => {
@@ -13,12 +13,12 @@ function ModalForm(props) {
             setErrors({ ...errors, [field]: null });
     }
     const findFormErrors = () => {
-        const { desc, date } = form;
+        const { id, desc, date } = form;
         const newErrors = {};
 
         if (!desc || desc === '') newErrors.desc = 'cannot be blank!';
         else if (!props.edit && props.tasks.filter(t => t.description === desc).length > 0) newErrors.desc = 'Task already in the list!';
-        else if(props.edit && props.tasks.find(t => t.description === desc) !== undefined) newErrors.desc = 'Task already in the list!';
+        else if (props.edit && props.tasks.filter(t => t.id !== id).find(t => t.description === desc) !== undefined) newErrors.desc = 'Task already in the list!';
 
         if (dayjs(date) < dayjs().subtract(1, 'day')) newErrors.date = 'Invalid date!';
         return newErrors;
@@ -32,16 +32,13 @@ function ModalForm(props) {
             setErrors(newErrors);
         }
         else {
+            console.log(form.date);
             let new_Task = {};
-            if (props.edit){
-                if(form.date.isValid())
-                    new_Task = { id: props.task.id, description: form.desc, urgent: form.urgent, private: form.private, deadline: form.date };
-                else
-                    new_Task = { id: props.task.id, description: form.desc, urgent: form.urgent, private: form.private, deadline: undefined };
+            if (props.edit) {
+                    new_Task = { id: props.task.id, description: form.desc, urgent: form.urgent, private: form.private, deadline: form.date, completed: props.task.completed };
             }
-                
             else {
-                new_Task = { id: props.tasks.length + 1, description: form.desc, urgent: form.urgent, private: form.private, deadline: form.date };
+                new_Task = { id: props.tasks.length + 1, description: form.desc, urgent: form.urgent, private: form.private, deadline: form.date, completed: 0};
                 setForm({});
             }
             props.TaskAdder(new_Task);
@@ -50,17 +47,17 @@ function ModalForm(props) {
     }
 
     const handleDate = (date) => {
-        if (date!==undefined) return date.format('YYYY-MM-DD');
+        if (date !== undefined) return date.format('YYYY-MM-DDTHH:mm');
         else return date;
     }
     return (<>
         <Modal show={props.show} onHide={props.handleClose} animation={false}>
             <Modal.Header closeButton>
-                {props.edit ? <Modal.Title>Edit task</Modal.Title> : <Modal.Title>Insert a new task</Modal.Title> }
-                
+                {props.edit ? <Modal.Title>Edit task</Modal.Title> : <Modal.Title>Insert a new task</Modal.Title>}
+
             </Modal.Header>
-             {props.edit ? <Modal.Body>Compile the form down below to edit a new task.</Modal.Body> : <Modal.Body>Compile the form down below to insert a new task.</Modal.Body>}
-            
+            {props.edit ? <Modal.Body>Compile the form down below to edit a new task.</Modal.Body> : <Modal.Body>Compile the form down below to insert a new task.</Modal.Body>}
+
 
             <Form>
                 <Form.Group className="ml-3 mr-3" controlId="description">
@@ -72,11 +69,11 @@ function ModalForm(props) {
                 <Form.Group>
                     <Form.Switch custom id="urgent-switch" label="Urgent" className="ml-5 mb-2" defaultChecked={form.urgent} onChange={event => setField('urgent', event.target.checked)} />
                     <Form.Switch custom id="private-switch" label="Private" className="ml-5 mb-2" defaultChecked={form.private} onChange={event => setField('private', event.target.checked)} />
-                   
+
                 </Form.Group>
                 <Form.Group className="ml-3 mr-3" controlId="data">
                     <Form.Label className="ml-2">Task Deadline</Form.Label>
-                    <Form.Control type="date" isInvalid={!!errors.date} defaultValue={handleDate(form.date)} onChange={event => setField('date', dayjs(event.target.value))} />
+                    <Form.Control type="datetime-local" isInvalid={!!errors.date} defaultValue={handleDate(form.date)} onChange={event => setField('date', dayjs(event.target.value))} />
                     <Form.Control.Feedback type="invalid"> {errors.date} </Form.Control.Feedback>
                 </Form.Group>
             </Form>

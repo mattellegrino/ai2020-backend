@@ -26,7 +26,9 @@ exports.listTasks = () => {
 exports.listTasksFiltered = (filter) => {
     return new Promise((resolve, reject) => {
         let sql = '';
-        if (filter === "Important")
+        if(filter === "All")
+            sql = 'SELECT * FROM tasks';
+        else if (filter === "Important")
             sql = 'SELECT * FROM tasks WHERE important=1';
         else if (filter === "Private")
             sql = 'SELECT * FROM tasks WHERE private=1';

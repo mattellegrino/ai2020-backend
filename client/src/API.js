@@ -30,7 +30,7 @@ async function RetrieveTaskListFiltered(filter) {
 function addTaskDB(task) {
     // call POST /api/tasks
     return new Promise((resolve, reject) => {
-        const f = { id: task.id, description: task.description, urgent: task.urgent ? 1 : 0, private: task.private ? 1 : 0, deadline: task.deadline ? task.deadline.format('YYYY-MM-DD') : undefined };
+        const f = { id: task.id, description: task.description, urgent: task.urgent ? 1 : 0, private: task.private ? 1 : 0, deadline: task.deadline ? task.deadline.format('YYYY-MM-DD HH:mm') : undefined };
         fetch('/api/tasks', {
             method: 'POST',
             headers: { 'Content-type': 'application/json' },
@@ -70,7 +70,7 @@ function updateTask(task) {
         fetch(`api/tasks/${task.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: task.id, description: task.description, important: task.urgent, completed: task.completed, private: task.private, deadline: task.deadline ? task.deadline.format('YYYY-MM-DD') : undefined })
+            body: JSON.stringify({ id: task.id, description: task.description, important: task.urgent, completed: task.completed, private: task.private, deadline: task.deadline ? task.deadline.format('YYYY-MM-DD HH:mm') : undefined })
         }).then((response) => {
             if (response.ok) {
                 resolve(null);
@@ -85,6 +85,20 @@ function updateTask(task) {
     })
 }
 
+function markTask(task){
+    // call PIT /api/tasks/:id/:mark   
+    return new Promise((resolve, reject) => {
 
-const API = { RetrieveTaskList, addTaskDB, updateTask, deleteTask, RetrieveTaskListFiltered };
+        fetch(`/api/tasks/${task.id}/${task.completed}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: task.id, description: task.description, important: task.urgent, completed: task.completed, private: task.private, deadline: task.deadline ? task.deadline.format('YYYY-MM-DD HH:mm') : undefined})        
+        }).then((response) => {
+            if(response.ok)
+                resolve(null);
+            else response.json().then((obj) => { reject(obj)} );
+        }).catch(err => { reject({'error': 'Cannot communicate with the server!' }) })
+    })
+}
+const API = { RetrieveTaskList, addTaskDB, updateTask, deleteTask, RetrieveTaskListFiltered, markTask };
 export default API;

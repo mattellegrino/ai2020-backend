@@ -28,7 +28,7 @@ function SidebarTasks(props) {
                 <Link to={{
                     pathname: '/Next7Days',
                     state: {filter: 'Next7Days'}
-                }} className="text-light"><ListGroup.Item action variant={activate('Next 7 Days')} onClick={() => props.handleFilter('Next 7 Days')}> Next 7 Days </ListGroup.Item></Link>
+                }} className="text-light"><ListGroup.Item action variant={activate('Next 7 Days')} onClick={() => props.handleFilter('Next7Days')}> Next 7 Days </ListGroup.Item></Link>
                 <Link to={{
                     pathname: '/Private',
                     state: {filter: 'Private'}
