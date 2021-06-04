@@ -100,5 +100,50 @@ function markTask(task){
         }).catch(err => { reject({'error': 'Cannot communicate with the server!' }) })
     })
 }
-const API = { RetrieveTaskList, addTaskDB, updateTask, deleteTask, RetrieveTaskListFiltered, markTask };
+
+async function login(credentials) {
+  let response = await fetch('/api/sessions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+  if(response.ok) {
+    const user = await response.json();
+    return user.name;
+  }
+  else {
+      const errDetails = await response.text();
+      throw errDetails;
+  }
+}
+
+async function getUserInfo() {
+  const response = await fetch('api/sessions/current');
+  const userInfo = await response.json();
+  if (response.ok) {
+    return userInfo;
+  } else {
+    throw userInfo;  // an object with the error coming from the server
+  }
+}
+
+async function logout() {
+    let response = await fetch('/api/logout', {
+        method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    } 
+    });
+    if(response.ok)
+    {
+        return true;
+    }
+    else
+    return false;
+}
+
+
+const API = { RetrieveTaskList, addTaskDB, updateTask, deleteTask, RetrieveTaskListFiltered, markTask,login,logout,getUserInfo };
 export default API;

@@ -1,4 +1,4 @@
-import { Nav, ListGroup } from 'react-bootstrap'
+import { Nav, ListGroup,Button} from 'react-bootstrap'
 
 import { Link } from 'react-router-dom';
 
@@ -34,6 +34,7 @@ function SidebarTasks(props) {
                     state: {filter: 'Private'}
                 }} className="text-light"><ListGroup.Item action variant={activate('Private')} onClick={() => props.handleFilter('Private')}> Private </ListGroup.Item></Link>
             </ListGroup>
+            <Button onClick={()=> props.doLogout()}> Logout </Button>
         </Nav>
     );
 }

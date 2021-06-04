@@ -3,9 +3,10 @@ import SidebarTasks from './Sidebar_Comp'
 import { TasksContent } from './Tasks_Content'
 import AddTask from './AddButton'
 import { useState, useEffect } from 'react'
-import { Route, Switch, useLocation } from 'react-router'
+import { Route, Switch, useLocation, Redirect } from 'react-router'
 import { Clock } from 'react-bootstrap-icons'
 import API from '../API'
+import { LoginForm } from "../LoginForm";
 
 function PageContent() {
     const location = useLocation();
@@ -13,7 +14,19 @@ function PageContent() {
     const [tasks, setTasks] = useState([]);
     const [dirty, setDirty] = useState(true);
     const [loading, setLoading] = useState(true);
-    const [errorMsg, setErrorMsg] = useState('');
+    const [errorMsg, setErrorMsg] = useState(" ");
+    const [message, setMessage] = useState(" ");
+    const [loggedIn, setLoggedIn] = useState(false);
+
+    useEffect(() => {
+    const checkAuth = async () => {
+      // TODO: qui avremo le info sull'utente dal server, possiamo salvare da qualche parte
+      const response = await API.getUserInfo();
+      console.log(response);
+      setLoggedIn(true);
+    };
+    checkAuth();
+    }, []);
 
     useEffect(() => {
         const getTasks = async () => {
@@ -29,7 +42,7 @@ function PageContent() {
                 console.error(err);
             });;
         }
-    }, [tasks.length, dirty]);
+    }, [tasks.length, dirty,loggedIn]);
 
     const handleFilter = (new_f) => {
         setFilter(new_f);
@@ -89,17 +102,47 @@ function PageContent() {
             }).catch(err => handleErrors(err));
     };
 
+    const doLogin = async (credentials) => {
+    try {
+      const user = await API.login(credentials);
+      setLoggedIn(true);
+      setMessage({ msg: `Welcome, ${user}!`, type: "success" });
+    } catch (err) {
+      setMessage({ msg: err, type: "danger" });
+    }
+  };
+
+  const doLogout = async() => {
+      try{
+          const log = await API.logout();
+          setLoggedIn(false);
+          return true;
+      }
+      catch(err) {
+          return false;
+      }
+  }
+
 
     return (
         <Container fluid>
             <Row className="vheight-100">
-                <SidebarTasks tasks={tasks} handleFilter={handleFilter} filter={filter} />
+                {loggedIn ?
+                (<SidebarTasks tasks={tasks} handleFilter={handleFilter} filter={filter} doLogout={doLogout}/>):( <span /> )}
                 <Switch>
+                    <Route path="/login">
+                      <>
+                      {" "}
+                      {loggedIn ? (<Redirect to="/" />) : (<LoginForm login={doLogin} />)}
+                      {" "}
+                      </>
+                    </Route>
                     <Route path="/">
-                        <Row className="below-nav">{errorMsg && <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible> {errorMsg} </Alert>}</Row>
-                        {loading ? <span className="col-sm-8 col-12 below-nav" > <h1><Clock /> Please wait, loading the list of tasks...</h1> </span>
-                            : <TasksContent tasks={tasks} filter={filter} deleteTask={deleteTask} TaskAdder={updateTask} />
-                        }
+                        {loggedIn ? (<>
+                    <Row className="below-nav">{message && (<Alert variant={message.type} onClose={() => setMessage('')} dismissible> {" "}{message.msg}{" "} </Alert>)}</Row>
+                        {loading ? (<span className="col-sm-8 col-12 below-nav" > <h1><Clock /> Please wait, loading the list of tasks...</h1> </span>) : 
+                        (<TasksContent tasks={tasks} filter={filter} deleteTask={deleteTask} TaskAdder={updateTask} />)} </>) : 
+                        ( <Redirect to="/login" />)}
                     </Route>
                     <Route exact path="/All">
                         <Row>{errorMsg && <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible> {errorMsg} </Alert>}</Row>

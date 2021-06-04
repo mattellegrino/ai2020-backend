@@ -16,7 +16,9 @@ function TasksContent(props) {
     return (
         <Container className="col-sm-8 col-12 below-nav">
             <h1><strong>Filter Selected: </strong><i>{props.filter}</i></h1>
+
             <Alert variant="warning" >Note: Use the checkbox provided for each task to mark/unmark the task as completed/uncompleted</Alert>
+           
             <ListGroup variant="flush">
                 {
                     props.tasks.filter(task => {
